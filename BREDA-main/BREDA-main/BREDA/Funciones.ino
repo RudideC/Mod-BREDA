@@ -1,7 +1,6 @@
 //-------------------------------------------------
 //              Funciones generales
 //-------------------------------------------------
-
 void error_warning() 
 {
   for (int i=0; i<20; i++)
@@ -26,10 +25,12 @@ void power_relay(bool status)
 void send_sensor_data()
 {
   // Buffer para construir el paquete
-  uint8_t buffer[28];  // 
+  uint8_t buffer[30];  // 2 bytes sincro + 28 bytes datos
   uint8_t idx = 0;
   
-
+  // BYTES DE SINCRONIZACIÓN
+  buffer[idx++] = 0xFE;
+  buffer[idx++] = 0xFB;
   
   // Copiar datos con interrupciones deshabilitadas
   noInterrupts();
@@ -59,17 +60,16 @@ void send_sensor_data()
   interrupts();
 
   // Enviar todo el paquete de una vez
-  Serial3.write(buffer, 28);
+  Serial4.write(buffer, sizeof(buffer));
     
   // Debug opcional (comentar en producción)
-  /*
+  
   Serial.print("[SENT] Time: ");
   Serial.print(timestamp);
   Serial.print(" ms | Thrust: ");
   Serial.print(thrust);
   Serial.print(" | Pressure: ");
-  Serial.println(avg_pressure);
-  */
+  Serial.println(transducer_avg);
 }
 
 //-------------------------------------------------
@@ -119,7 +119,6 @@ void print_serial_TP()
 {
   serial_time = millis();
 
-  noInterrupts();
   for (int i=0; i<4; ++i)
   {
     Serial.print("TemADC_");    
@@ -147,7 +146,6 @@ void print_serial_TP()
     }
     Serial.println();
   }
-  interrupts();
 
   Serial.print("Célula: ");
   Serial.println(thrust);
