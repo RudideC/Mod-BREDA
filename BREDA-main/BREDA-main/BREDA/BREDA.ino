@@ -1,8 +1,7 @@
 #include "Config.h"
 
-// Timer para envío a 40Hz (25ms de periodo)
 unsigned long send_timer = 0;
-const unsigned long send_interval = 25; // 25ms = 40Hz
+const unsigned long send_interval = 10; // 100Hz
 
 void print_tp1()
 {
