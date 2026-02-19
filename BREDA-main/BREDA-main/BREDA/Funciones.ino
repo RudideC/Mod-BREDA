@@ -63,13 +63,14 @@ void send_sensor_data()
   Serial4.write(buffer, sizeof(buffer));
     
   // Debug opcional (comentar en producción)
-  
+  /*
   Serial.print("[SENT] Time: ");
   Serial.print(timestamp);
   Serial.print(" ms | Thrust: ");
   Serial.print(thrust);
   Serial.print(" | Pressure: ");
   Serial.println(transducer_avg);
+  */
 }
 
 //-------------------------------------------------

@@ -136,8 +136,8 @@ String pressure_file_header = "Time, Chamber_Pressure, Raw_Transducer";
 uint8_t file_number = 0;
 
 // SD
-const uint32_t RB_size = 400 * 512;
-const uint32_t file_size = 10 * 100000 * 600;
+const uint32_t RB_size = 20 * 512;
+const uint32_t file_size = 100 * 1024;
 
 bool file_closed = true;
 bool SD_ready = true;

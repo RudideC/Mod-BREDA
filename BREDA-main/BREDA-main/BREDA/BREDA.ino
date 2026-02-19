@@ -138,17 +138,28 @@ void setup()
 void loop() 
 {
   // Write it in the SD
+  static uint16_t flush_counter = 0;
+
   if (RB_data.bytesUsed() >= 512 && !file_data.isBusy())
   {
     RB_data.writeOut(512);
   }
 
-  #if TRANSDUCER == 1 
-    if (RB_pressure.bytesUsed() >= 512 && !file_pressure.isBusy())
-    {
-      RB_pressure.writeOut(512);
-    }
+  #if TRANSDUCER == 1
+  if (RB_pressure.bytesUsed() >= 512 && !file_pressure.isBusy())
+  {
+    RB_pressure.writeOut(512);
+  }
   #endif
+
+  if (++flush_counter >= 5000)
+  {
+    flush_counter = 0;
+    file_data.flush();
+    #if TRANSDUCER == 1
+      file_pressure.flush();
+    #endif
+  }
 
   // Transducer offset
   #if TRANSDUCER == 1 
@@ -166,12 +177,12 @@ void loop()
     handle_order(rcvd_byte);
   }
 
-  // ENVÍO de datos a 40Hz por UART4
+  // ENVÍO de datos por UART4
   if (millis() - send_timer >= send_interval)
   {
     send_timer = millis();
     send_sensor_data();
-    print_tp1();
+    //print_tp1();
   }
   
   // Turns on and off the led each second

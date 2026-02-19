@@ -10,7 +10,8 @@ void file_select_name()
   while (f || s)
   {
     // Checks if the file exist either in the SD or flash to change it
-    newName = ++file_number + file_data_name;
+    String newName = String(file_number) + file_data_name;
+    file_number++;
     #if FLASH_ON == 1
       f = flash_chip.exists(newName.c_str());
     #else
@@ -42,44 +43,38 @@ void SD_file_open()
       return;
 
     file_select_name();
-    String newName = file_number + file_data_name;
+    String newName = String(file_number) + file_data_name;
+    
+    Serial.println("Abriendo archivo...");
     if (!file_data.open(newName.c_str(), O_RDWR | O_CREAT))
     {
+      Serial.println("ERROR: open fallido");
       errorByte |= B100;
-      error_warning();
       SD_ready = false;
       return;
     }
+    Serial.println("Archivo abierto OK");
 
-    #if TRANSDUCER == 1
-      newName = file_number + file_pressure_name;
-      if (!file_pressure.open(newName.c_str(), O_RDWR | O_CREAT))
-      {
-        errorByte |= B1000;
-        error_warning();
-        SD_ready = false;
-        return;
-      }
-    #endif
-
-    file_closed = false;
-
-    // File header
     file_data.println(general_file_header);
+    Serial.println("Header escrito");
 
-    // Allocate space to avoid huge delays
-    file_data.preAllocate(file_size); 
+    // esta mierda no va
+    /*if (!file_data.preAllocate(file_size))
+    {
+      Serial.println("ERROR: preAllocate fallido");
+      errorByte |= B100;
+      SD_ready = false;
+      return;
+    }
+    Serial.println("preAllocate OK");
+    */
 
-    // Starts the Ring Buffs
     RB_data.begin(&file_data);
-    
-    #if TRANSDUCER == 1
-      file_pressure.println(pressure_file_header);
-      file_pressure.preAllocate(file_size);
-      RB_pressure.begin(&file_pressure);
-    #endif
-  #endif  
+    Serial.println("RingBuf iniciado");
+    // ...
+  #endif
 }
+
 
 void SD_file_close()
 {
@@ -119,8 +114,14 @@ void SD_file_data_update()
 
     // Transducer data (Average)
     RB_data.print(", ");
-    RB_data.print(transducer_avg / transducer_counter, 5);
-
+    if (transducer_counter > 0)
+    {
+      RB_data.print(transducer_avg / transducer_counter, 5);
+    }
+    else
+    {
+      RB_data.print(0.0, 5);
+    }
     transducer_avg = 0;
     transducer_counter = 0;
 
