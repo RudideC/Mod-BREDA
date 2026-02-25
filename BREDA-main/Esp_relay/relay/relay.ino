@@ -48,7 +48,7 @@ void onDataRecv(const esp_now_recv_info *recv_info, const uint8_t *incomingData,
 
 void setup() {
   pinMode(ERROR_PIN, OUTPUT);
-  digitalWrite(ERROR_PIN, LOW);
+  digitalWrite(ERROR_PIN, HIGH);
 
   pinMode(PIN_IGNICION, OUTPUT);
   digitalWrite(PIN_IGNICION, LOW);

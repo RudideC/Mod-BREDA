@@ -6,7 +6,7 @@
 #define ERROR_PIN 13
 #define BUFFER_SIZE 30
 
-uint8_t relayMAC[] = {0xA4, 0xE5, 0x7C, 0xF6, 0xC2, 0x40};
+uint8_t relayMAC[] = {0x08, 0xD1, 0xF9, 0xCE, 0x16, 0x14}; // 08:d1:f9:ce:16:14
 
 typedef struct {
   uint8_t sync1;
@@ -86,7 +86,7 @@ void setup() {
 
   if (esp_now_add_peer(&peerInfo) != ESP_OK) while(1);
 
-  // Timer a 50Hz = 20000µs
+  // Timer a 50Hz = 20000us
   const esp_timer_create_args_t timer_args = {
     .callback = &timer_callback,
     .name = "serial_out_timer"
