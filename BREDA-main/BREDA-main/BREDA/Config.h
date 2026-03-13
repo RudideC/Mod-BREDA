@@ -128,10 +128,11 @@ const float TP_const = ((vref / int24max) * 1000000) / 4; // constante para esca
 volatile float tempTP[14] = {0}; // array que almacena las temperaturas de los termopares
 volatile int32_t tempTP_raw[14] = {0}; // array que almacena las temperaturas de los termopares
 volatile float tempADC[4] = {0}; // array que almacena las temperaturas de los ADC
-volatile float thrust = 0; // almacena el valor del empuje
+volatile int32_t thrust = 0; // almacena el valor del empuje
+volatile int32_t prev_thrust = 1; // almacena el valor del empuje anterior
 
 // File 
-String general_file_header = "Time, Thrust, Pressure, ADC1_Temp, ADC2_Temp, ADC3_Temp, ADC4_Temp, TP_1, TP_2, TP_3, TP_4, TP_5, TP_6, TP_7, TP_8, TP_9, TP_10, TP_11, TP_12, TP_13, TP_14";
+String general_file_header = "Time, Thrust, Pressure, ADC1_Temp, ADC2_Temp, ADC3_Temp, ADC4_Temp, TP_1, TP_2, TP_3, TP_4, TP_5, TP_6, TP_7, TP_8, TP_9";
 String pressure_file_header = "Time, Chamber_Pressure, Raw_Transducer";
 uint8_t file_number = 0;
 
@@ -158,6 +159,7 @@ volatile uint32_t transducer_counter_offset = 0;
 volatile uint32_t transducer_freq = 0;
 
 volatile int16_t transducer_raw = 0;
+volatile int16_t pressure = 0;
 volatile float transducer_avg = 0;
 volatile float transducer_pressure = 0;
 

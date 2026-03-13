@@ -37,25 +37,25 @@ void send_sensor_data()
   
   // Timestamp en milisegundos (4 bytes - uint32_t)
   uint32_t timestamp = millis();
-  memcpy(&buffer[idx], &timestamp, 4);
-  idx += 4;
+  memcpy(&buffer[idx], &timestamp, sizeof(timestamp));
+  idx += sizeof(timestamp);
   
-  // Thrust/Empuje (2 bytes - multiplicar × 100 para 2 decimales)
-  int16_t thrust_int = (int16_t)(thrust * 100.0f);
-  memcpy(&buffer[idx], &thrust_int, 2);
-  idx += 2;
+  // Thrust/Empuje (4 bytes - multiplicar × 100 para 2 decimales)
+  int32_t thrust_int = (int32_t)(thrust * 100.0f);
+  memcpy(&buffer[idx], &thrust_int, sizeof(thrust_int));
+  idx += sizeof(thrust_int);
   
-  // 10 Temperaturas de termopares (20 bytes - multiplicar × 100)
-  for (int i = 0; i < 10; i++)
+  // 9 Temperaturas de termopares (18 bytes - multiplicar × 100)
+  for (int i = 0; i < 9; i++)
   {
     int16_t temp_int = (int16_t)(tempTP[i] * 100.0f);
-    memcpy(&buffer[idx], &temp_int, 2);
-    idx += 2;
+    memcpy(&buffer[idx], &temp_int, sizeof(temp_int));
+    idx += sizeof(temp_int);
   }
   
-  // Transductor raw (2 bytes - dato crudo del ADC)
-  memcpy(&buffer[idx], &transducer_raw, 2);
-  idx += 2;
+  // Transductor presión (2 bytes - dato crudo del ADC)
+  memcpy(&buffer[idx], &pressure, sizeof(pressure));
+  idx += sizeof(pressure);
   
   interrupts();
 

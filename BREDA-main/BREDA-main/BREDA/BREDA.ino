@@ -129,7 +129,7 @@ void setup()
 
   ADC_config(ADC1, false);
   ADC_config(ADC2, false);
-  ADC_config(ADC3, false);
+  ADC_config(ADC3, true);
   ADC_config(ADC4, true);
 
   performance_started(); 

@@ -44,6 +44,7 @@ void SD_file_open()
 
     file_select_name();
     String newName = String(file_number) + file_data_name;
+    String newName2 = String(file_number) + file_pressure_name;
     
     Serial.println("Abriendo archivo...");
     if (!file_data.open(newName.c_str(), O_RDWR | O_CREAT))
@@ -72,6 +73,8 @@ void SD_file_open()
     RB_data.begin(&file_data);
     Serial.println("RingBuf iniciado");
     // ...
+
+    // el archivo de presión no lo necesitamos, en cualquier caso sería lo mismo que el de datos normales pero con sus propias variables
   #endif
 }
 
@@ -110,10 +113,10 @@ void SD_file_data_update()
         
     // Cell data
     RB_data.print(", ");
-    RB_data.print(thrust, 5);
+    RB_data.print(thrust, DEC); // DEC == 10, base decimal
 
     // Transducer data (Average)
-    RB_data.print(", ");
+    /*
     if (transducer_counter > 0)
     {
       RB_data.print(transducer_avg / transducer_counter, 5);
@@ -121,7 +124,12 @@ void SD_file_data_update()
     else
     {
       RB_data.print(0.0, 5);
-    }
+    }*/
+
+    // Transducer data (NO Average)
+    RB_data.print(", ");
+    RB_data.print(pressure, DEC); // la función print con ints determina base, no decimales
+
     transducer_avg = 0;
     transducer_counter = 0;
 
@@ -131,7 +139,7 @@ void SD_file_data_update()
       RB_data.print(tempADC[i]);
     }
 
-    for (int i = 0; i < 14; ++i)
+    for (int i = 0; i < 9; ++i)
     {
       RB_data.print(", ");
       RB_data.print(tempTP[i]);   

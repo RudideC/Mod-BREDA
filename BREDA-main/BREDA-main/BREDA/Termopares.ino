@@ -38,18 +38,18 @@ float TP_polynom(int32_t raw) {
 //                ADC Configuration
 //-------------------------------------------------
 
-void ADC_config(MCP3564& adc, bool ID_ADC4) {
+void ADC_config(MCP3564& adc, bool especial) {
   uint8_t conf[1];
 
   // Configuro el registro 1 (Pag 92 de la data sheet)
-  if (ID_ADC4)
-    conf[0] = B00011000; // ADC4 tiene menos Oversampling porque no tiene tanta velocidad de reloj 
+  if (especial)
+    conf[0] = B00011100; // ADC4 tiene menos Oversampling porque no tiene tanta velocidad de reloj 
   else
     conf[0] = B00100000; 
   adc.writeReg(conf, MCP3564_ADR_CONFIG1);
 
   // Configuro el registro 2 (Pag 93 de la data sheet)
-  conf[0] = B10011001; 
+  conf[0] = B10011011; 
   adc.writeReg(conf, MCP3564_ADR_CONFIG2);
 
   // Configuro el registro 3 (Pag 94 de la data sheet)
@@ -62,7 +62,7 @@ void ADC_config(MCP3564& adc, bool ID_ADC4) {
 
   // Configuro el registro del modo SCAN (Pag 97 de la data sheet)
   uint16_t channelMask = 0;
-  if (ID_ADC4)
+  if (especial)
     channelMask = B00011011 << 8; // ADC4 no tiene el CH4-CH5 activado
   else
     channelMask = B00011111 << 8; 
@@ -118,7 +118,7 @@ void ADC2_IRQ() { // declara la funcion de lectura del IRQ
     tempTP_raw[chID + 4] = temp;
     tempTP[chID + 4] = TP_polynom(temp) + tempADC[0];
   }
-} 
+}
 
 void ADC3_IRQ() { // declara la funcion de lectura del IRQ
   
@@ -130,6 +130,15 @@ void ADC3_IRQ() { // declara la funcion de lectura del IRQ
 
   if (chID == 4) // temperatura interna
     tempADC[2] = internalTemp_const * vref * temp - 269.13; // guarda la temperatura del ADC1 en la posición primera del array
+  else if (chID == 1) { // celula de carga
+    temp = ((temp + 320.85) / 218.10) * 9.81;
+    if (prev_thrust != 0) {
+      thrust = int32_t((temp + prev_thrust) / 2);
+    }else {
+      thrust = temp; 
+    }
+    prev_thrust = temp;
+  }
   else
   {
     tempTP_raw[chID + 8] = temp;
@@ -147,8 +156,10 @@ void ADC4_IRQ() { // declara la funcion de lectura del IRQ
 
   if (chID == 4) // temperatura interna
     tempADC[3] = internalTemp_const * vref * temp - 269.13; // guarda la temperatura del ADC1 en la posición primera del array
+  /*
   else if (chID == 3) // celula de carga
     thrust = temp;
+  */
   else
   {
     tempTP_raw[chID + 12] = temp;

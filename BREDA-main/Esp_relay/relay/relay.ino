@@ -1,13 +1,14 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
-#include <esp_timer.h>  
+#include <esp_timer.h>
 
 #define ERROR_PIN    13
 #define PIN_IGNICION 33
 #define COMANDO_IGNICION 0x04
+#define IGNICION_DURACION_MS 5000
 
-uint8_t ordenadorMAC[] = {0x94, 0xE6, 0x86, 0x44, 0x9E, 0xC4};
+uint8_t ordenadorMAC[] = {0xD4, 0xE9, 0xF4, 0xFA, 0xA2, 0xF4};
 
 typedef struct {
   uint8_t sync1;
@@ -20,8 +21,10 @@ typedef struct {
 } PacketComando;
 
 PacketData paquete;
-volatile bool paquete_listo = false;   
-volatile bool enviar_ahora = false;    
+volatile bool paquete_listo = false;
+volatile bool enviar_ahora = false;
+volatile bool ignicion_activa = false;
+unsigned long ignicion_tiempo = 0;
 
 void IRAM_ATTR timer_callback(void* arg) {
   enviar_ahora = true;
@@ -41,6 +44,8 @@ void onDataRecv(const esp_now_recv_info *recv_info, const uint8_t *incomingData,
 
   if (cmd.comando == COMANDO_IGNICION) {
     digitalWrite(PIN_IGNICION, HIGH);
+    ignicion_activa = true;
+    ignicion_tiempo = millis();
   } else {
     Serial.write(cmd.comando);
   }
@@ -79,10 +84,15 @@ void setup() {
   };
   esp_timer_handle_t timer_handle;
   esp_timer_create(&timer_args, &timer_handle);
-  esp_timer_start_periodic(timer_handle, 12500);  
+  esp_timer_start_periodic(timer_handle, 12500);
 }
 
 void loop() {
+  if (ignicion_activa && (millis() - ignicion_tiempo >= IGNICION_DURACION_MS)) {
+    digitalWrite(PIN_IGNICION, LOW);
+    ignicion_activa = false;
+  }
+
   if (Serial.available() >= 2) {
     uint8_t byte1 = Serial.read();
 
@@ -116,7 +126,7 @@ void loop() {
 
     paquete.sync1 = 0xFE;
     paquete.sync2 = 0xFB;
-    paquete_listo = true;  
+    paquete_listo = true;
   }
 
   if (enviar_ahora) {

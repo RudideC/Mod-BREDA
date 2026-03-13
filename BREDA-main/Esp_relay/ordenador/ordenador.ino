@@ -6,7 +6,7 @@
 #define ERROR_PIN 13
 #define BUFFER_SIZE 30
 
-uint8_t relayMAC[] = {0x08, 0xD1, 0xF9, 0xCE, 0x16, 0x14}; // 08:d1:f9:ce:16:14
+uint8_t relayMAC[] = {0xD4, 0xE9, 0xF4, 0xF9, 0x32, 0x18}; // d4:e9:f4:f9:32:18
 
 typedef struct {
   uint8_t sync1;

@@ -45,8 +45,9 @@ void transducer_measure()
       ++transducer_counter_offset;
     }
 
-    transducer_pressure = (transducer_raw - transducer_offset) * transducer_const;
-    
+    //transducer_pressure = (transducer_raw - transducer_offset) * transducer_const;
+    pressure = transducer_raw;
+
     transducer_avg += transducer_pressure;
     ++transducer_counter;
     ++transducer_freq;
